@@ -13,9 +13,6 @@ const formatToAspectRatio: Record<string, "1:1" | "3:4" | "4:3" | "9:16" | "16:9
   [ImageFormat.PHONE]: "1:1"  
 };
 
-/**
- * Extrai o MIME type de uma string base64 do navegador
- */
 const getMimeTypeFromBase64 = (base64: string): string => {
   const match = base64.match(/^data:([^;]+);base64,/);
   return match ? match[1] : 'image/png';
@@ -49,6 +46,9 @@ export const generateProductCover = async (
   };
 
   const aspectRatio = formatToAspectRatio[format] || "1:1";
+  
+  // Use "Método Pulmão Livre" as fallback if title is empty
+  const effectiveTitle = title.trim() || "Método Pulmão Livre";
 
   let formatInstruction = "";
   if (format === ImageFormat.BOOK) {
@@ -63,9 +63,7 @@ export const generateProductCover = async (
         ? "Surface: Premium minimalist table with soft aesthetic lighting." 
         : themeDescriptions[theme]);
 
-  const brandingInstruction = title.trim() 
-    ? `Branding: Main Title "${title}", Subtitle "${subtitle}". Elegant typography.`
-    : `Focus: Visuals only. High-quality rendering without text placeholders.`;
+  const brandingInstruction = `Branding: Main Subject "${effectiveTitle}"${subtitle.trim() ? `, Subtitle "${subtitle}"` : ""}. Elegant professional typography layout.`;
 
   const editingContext = base64Image 
     ? `Action: Use the provided reference image as the base. Edit and professionalize it. 
@@ -73,6 +71,7 @@ export const generateProductCover = async (
     : `Details: ${customDescription || "Follow theme guidelines."}`;
 
   const basePrompt = `TASK: Create a professional digital asset for ${format}.
+  SUBJECT: ${effectiveTitle}.
   STYLE: ${stylePrompts[style]}.
   THEME: ${themeDescriptions[theme]}.
   ${formatInstruction}
@@ -118,7 +117,6 @@ export const generateProductCover = async (
     throw new Error("Nenhuma imagem foi gerada. Tente mudar o estilo ou o prompt.");
   } catch (error: any) {
     console.error("Image generation failed in service:", error);
-    // Repassa o erro de forma mais limpa
     throw new Error(error.message || "Falha técnica na geração da imagem.");
   }
 };

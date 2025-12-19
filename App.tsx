@@ -83,11 +83,6 @@ const App: React.FC = () => {
   };
 
   const handleGenerate = async () => {
-    if (!title.trim() && !referenceImage) {
-      setError("Informe um título ou envie uma imagem para começar.");
-      return;
-    }
-    
     setIsGenerating(true);
     setError(null);
     setCurrentImages([]);
@@ -100,7 +95,6 @@ const App: React.FC = () => {
     try {
       const results: GeneratedImage[] = [];
       
-      // Geração sequencial para evitar timeout e erros de conexão por carga excessiva
       for (const fmt of formatsToGenerate) {
         try {
           const url = await generateProductCover(
@@ -118,19 +112,17 @@ const App: React.FC = () => {
             id: Math.random().toString(36).substr(2, 9),
             url,
             timestamp: Date.now(),
-            prompt: title || "Edição de Imagem",
+            prompt: title || "Método Pulmão Livre",
             style: selectedStyle,
             theme: selectedTheme,
             format: fmt as ImageFormat
           });
           
-          // Atualiza a UI progressivamente se estiver gerando todos
           if (formatsToGenerate.length > 1) {
              setCurrentImages([...results]);
           }
         } catch (innerErr: any) {
           console.error(`Erro ao gerar formato ${fmt}:`, innerErr);
-          // Se for o único formato, joga o erro para fora
           if (formatsToGenerate.length === 1) throw innerErr;
         }
       }
@@ -190,7 +182,7 @@ const App: React.FC = () => {
               <div className="space-y-3">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                    Título {referenceImage && <span className="text-teal-500 font-medium">(Opcional)</span>}
+                    Título <span className="text-teal-500 font-medium">(Opcional)</span>
                   </label>
                   <input 
                     type="text" value={title} onChange={(e) => setTitle(e.target.value)}
@@ -200,7 +192,7 @@ const App: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                    Subtítulo {referenceImage && <span className="text-teal-500 font-medium">(Opcional)</span>}
+                    Subtítulo <span className="text-teal-500 font-medium">(Opcional)</span>
                   </label>
                   <input 
                     type="text" value={subtitle} onChange={(e) => setSubtitle(e.target.value)}
@@ -211,7 +203,17 @@ const App: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imagem de Base / Referência</label>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Instruções da Imagem <span className="text-teal-500 font-medium">(O que deve aparecer?)</span></label>
+                <textarea 
+                  value={customDescription} onChange={(e) => setCustomDescription(e.target.value)}
+                  placeholder="Ex: Uma pessoa respirando ar puro em uma floresta com pulmões estilizados em 3D brilhando levemente..." 
+                  rows={3}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-teal-500 outline-none transition-all text-xs resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Imagem de Base <span className="text-teal-500 font-medium">(Opcional)</span></label>
                 {!referenceImage ? (
                   <div 
                     onClick={() => fileInputRef.current?.click()}
@@ -264,16 +266,6 @@ const App: React.FC = () => {
                     </button>
                   ))}
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Instruções de Edição</label>
-                <textarea 
-                  value={customDescription} onChange={(e) => setCustomDescription(e.target.value)}
-                  placeholder={referenceImage ? "Descreva as mudanças na imagem..." : "Ex: luz suave, fundo de estúdio..."} 
-                  rows={2}
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-teal-500 outline-none transition-all text-xs resize-none"
-                />
               </div>
 
               <div className="pt-2">
@@ -340,7 +332,7 @@ const App: React.FC = () => {
                   Pronto para Gerar?
                 </h3>
                 <p className="text-slate-400 text-[11px] md:text-sm mt-2 max-w-[200px] md:max-w-xs mx-auto font-medium leading-relaxed">
-                  Defina um título ou envie uma imagem base para começar sua edição.
+                  Descreva o que deseja na barra de instruções ou apenas toque em gerar.
                 </p>
               </div>
             )}
@@ -350,7 +342,7 @@ const App: React.FC = () => {
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
                   <div className="text-center">
-                    <p className="font-bold text-slate-800 text-sm md:text-lg">Processando Edição...</p>
+                    <p className="font-bold text-slate-800 text-sm md:text-lg">Processando Ativo...</p>
                     <p className="text-slate-400 text-[9px] uppercase tracking-widest mt-1">Isso pode levar alguns segundos</p>
                   </div>
                 </div>
