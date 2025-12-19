@@ -1,0 +1,5 @@
+{
+  "name": "Pulmão Livre Cover Studio",
+  "description": "Um gerador de capas de alta qualidade para o programa 'Método Pulmão Livre', usando Gemini 2.5 Flash Image para criar visuais profissionais.",
+  "requestFramePermissions": []
+}
